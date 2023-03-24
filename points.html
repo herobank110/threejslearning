@@ -73,21 +73,19 @@
         }
 
         window.onmousemove = (({ clientX: x, clientY: y }) => {
-            if (n < t) {
-                let p = getPath(x, y)
-                // let i = n++;
-                for (let i = 0; i < p.length; i++) {
-                    const [xi, yi] = p[i]
-                    geo.getAttribute('position').setXYZ(n + i, xi - w / 2, -(yi - h / 2), -1000);
-                    geo.getAttribute('color').setXYZ(n + i, 1, 1, 1);
-                    geo.getAttribute('size').setX(n + i, 20);
-                }
-                geo.getAttribute('position').needsUpdate = true;
-                geo.getAttribute('color').needsUpdate = true;
-                geo.getAttribute('size').needsUpdate = true;
-                n += p.length
-                geo.setDrawRange(0, n)
+            if (n >= t) return
+            let p = getPath(x, y)
+            for (let i = 0; i < p.length; i++) {
+                const [xi, yi] = p[i]
+                geo.getAttribute('position').setXYZ(n + i, xi - w / 2, -(yi - h / 2), -1000);
+                geo.getAttribute('color').setXYZ(n + i, 1, 1, 1);
+                geo.getAttribute('size').setX(n + i, 20);
             }
+            geo.getAttribute('position').needsUpdate = true;
+            geo.getAttribute('color').needsUpdate = true;
+            geo.getAttribute('size').needsUpdate = true;
+            n += p.length
+            geo.setDrawRange(0, n)
         })
 
     </script>
