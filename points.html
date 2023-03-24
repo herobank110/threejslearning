@@ -1,5 +1,4 @@
-<body style="margin:0">
-<div></div>
+<body style="margin:0;overflow:hidden;">
 <script type="module">
 import * as THREE from "three";
 let {innerWidth: w,innerHeight: h} = window
@@ -24,7 +23,7 @@ let sm = new THREE.ShaderMaterial({
   varying float fSize;
   void main() {
    float dist = 1. - distance(gl_PointCoord, vec2(0.5, 0.5));
-   float a = pow(dist + 0.3, fSize/2.0);
+   float a = pow(dist + 0.3, fSize/2.5);
    gl_FragColor = vec4(vColor, a);
   }`,
  blending:THREE.AdditiveBlending,depthTest:false,transparent:true,vertexColors:true })
@@ -41,7 +40,7 @@ scene.add(ps)
 let rend = new THREE.WebGLRenderer
 rend.setPixelRatio(window.devicePixelRatio)
 rend.setSize(w,h)
-document.querySelector("div").appendChild(rend.domElement)
+document.body.appendChild(rend.domElement)
 function tick(){
  rend.render(scene,cam)
  requestAnimationFrame(tick)
