@@ -2,9 +2,8 @@
   "name": "threejslearning",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "points": "parcel watch --cache-dir=build/cache --dist-dir=build/dist points.html"
   },
   "keywords": [],
   "author": "",

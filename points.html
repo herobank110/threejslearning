@@ -1,0 +1,44 @@
+<body style="margin:0">
+<div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.150.0/three.min.js" integrity="sha512-s23z8swIaqHGH1VAQiIO9Hv8tup9cVTV+TkhZJDXMn7/S0K7U0iVXOS5CtYvfDmsGEpoWRbl38xk7mLKEANrdQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+let {innerWidth: w,innerHeight: h} = window
+let cam = new THREE.PerspectiveCamera(40,w/h,1,10000)
+cam.position.z = 300
+let scene = new THREE.Scene
+let sm = new THREE.ShaderMaterial({
+ vertexShader:`
+  varying vec3 vColor;
+  void main() {
+   vColor = color;
+   vec4 mvp = modelViewMatrix * vec4(position, 1.0);
+   gl_PointSize = 20.0 * (300.0 / -mvp.z);
+   gl_Position = projectionMatrix * mvp;
+  }`,
+ fragmentShader:`
+  varying vec3 vColor;
+  void main() {
+   float dist = 1. - distance(gl_PointCoord, vec2(0.5, 0.5));
+   float a = pow(dist + 0.3, 8.);
+   gl_FragColor = vec4(vColor, a);
+  }`,
+ blending:THREE.AdditiveBlending,depthTest:false,transparent:true,vertexColors:true })
+let geo = new THREE.BufferGeometry
+geo.setAttribute('position',new THREE.Float32BufferAttribute([10,10,10,20,10,10],3))
+geo.setAttribute('color',new THREE.Float32BufferAttribute([0.5, 0.5, 0, 1,1,1],3))
+//geo.attributes.position.push(new THREE.Vector(20,20,20));
+geo.attributes.position.needsUpdate=true;
+//geo.attributes.color.push(new THREE.Vector(1,1,1));
+geo.attributes.color.needsUpdate=true;
+let ps = new THREE.Points(geo,sm)
+scene.add(ps)
+let rend = new THREE.WebGLRenderer
+rend.setPixelRatio(window.devicePixelRatio)
+rend.setSize(w,h)
+document.querySelector("div").appendChild(rend.domElement)
+function tick(){
+ rend.render(scene,cam)
+ requestAnimationFrame(tick)
+}
+tick()
+</script>
