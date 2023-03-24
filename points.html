@@ -3,8 +3,8 @@
         import * as THREE from "three";
 
         const lerp = (a, b, x) => a + (b - a) * x
+        const vlen = (a, b) => Math.sqrt(a * a + b * b)
         const mapRange = (x, a, b, c, d) => c + (d - c) * ((x - a) / (b - a));
-
 
         let { innerWidth: w, innerHeight: h } = window
         let cam = new THREE.PerspectiveCamera(40, w / h, 1, 10000)
@@ -55,15 +55,37 @@
         }
         tick()
 
+        let [lastX, lastY] = [-1, -1];
+        function getPath(x, y) {
+            let ret = []
+            if (lastX == -1) ret.push([x, y])
+            else {
+                let [dx, dy] = [x - lastX, y - lastY];
+                let l = vlen(dx, dy)
+                for (let i = 0; i < l; i += 2)
+                    ret.push([lerp(lastX, x, i / l), lerp(lastY, y, i / l)])
+            }
+
+            lastX = x
+            lastY = y
+            console.log(lastX, lastY);
+            return ret
+        }
+
         window.onmousemove = (({ clientX: x, clientY: y }) => {
             if (n < t) {
-                let i = n++;
-                geo.getAttribute('position').setXYZ(i, x - w / 2, -(y - h / 2), -1000);
-                geo.getAttribute('color').setXYZ(i, 1, 1, 1);
-                geo.getAttribute('size').setX(i, 20);
+                let p = getPath(x, y)
+                // let i = n++;
+                for (let i = 0; i < p.length; i++) {
+                    const [xi, yi] = p[i]
+                    geo.getAttribute('position').setXYZ(n + i, xi - w / 2, -(yi - h / 2), -1000);
+                    geo.getAttribute('color').setXYZ(n + i, 1, 1, 1);
+                    geo.getAttribute('size').setX(n + i, 20);
+                }
                 geo.getAttribute('position').needsUpdate = true;
                 geo.getAttribute('color').needsUpdate = true;
                 geo.getAttribute('size').needsUpdate = true;
+                n += p.length
                 geo.setDrawRange(0, n)
             }
         })
