@@ -2,6 +2,9 @@
 <script type="module">
 import * as THREE from "three";
 
+const lerp = (a, b, x) => a + (b-a)*x
+const mapRange = (x, a, b, c, d) => c + (d - c) * ((x - a) / (b - a));
+
 
 let {innerWidth: w,innerHeight: h} = window
 let cam = new THREE.PerspectiveCamera(40,w/h,1,10000)
@@ -54,7 +57,6 @@ tick()
 window.onmousemove=(({clientX:x,clientY:y}) => {
 if (n < t) {
 let i = n++;
-// geo.getAttribute('position').setXYZ(i, x-w/2, -y-h/2, 0);
 geo.getAttribute('position').setXYZ(i, x-w/2, -(y-h/2), -1000);
 geo.getAttribute('color').setXYZ(i, 1, 1, 1);
 geo.getAttribute('size').setX(i, 20);
