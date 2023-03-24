@@ -52,10 +52,10 @@ function tick(){
 tick()
 
 window.onmousemove=(({clientX:x,clientY:y}) => {
-console.log(x, y);
 if (n < t) {
 let i = n++;
-geo.getAttribute('position').setXYZ(i, x, y, 10);
+// geo.getAttribute('position').setXYZ(i, x-w/2, -y-h/2, 0);
+geo.getAttribute('position').setXYZ(i, x-w/2, -(y-h/2), -1000);
 geo.getAttribute('color').setXYZ(i, 1, 1, 1);
 geo.getAttribute('size').setX(i, 20);
 geo.getAttribute('position').needsUpdate = true;
