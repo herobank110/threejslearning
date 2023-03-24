@@ -28,7 +28,7 @@
   varying float fSize;
   void main() {
    float dist = 1. - distance(gl_PointCoord, vec2(0.5, 0.5));
-   float a = pow(dist + 0.3, fSize/2.5);
+   float a = pow(dist + 0.3, fSize/0.5);
    gl_FragColor = vec4(vColor, a);
   }`,
             blending: THREE.AdditiveBlending, depthTest: false, transparent: true, vertexColors: true
@@ -60,6 +60,8 @@
             let ret = []
             if (lastX == -1) ret.push([x, y])
             else {
+                x=lerp(lastX, x, 0.4)
+                y=lerp(lastY, y, 0.4)
                 let [dx, dy] = [x - lastX, y - lastY];
                 let l = vlen(dx, dy)
                 for (let i = 0; i < l; i += 2)
@@ -79,7 +81,7 @@
                 const [xi, yi] = p[i]
                 geo.getAttribute('position').setXYZ(n + i, xi - w / 2, -(yi - h / 2), -1000);
                 geo.getAttribute('color').setXYZ(n + i, 1, 1, 1);
-                geo.getAttribute('size').setX(n + i, 20);
+                geo.getAttribute('size').setX(n + i, 30);
             }
             geo.getAttribute('position').needsUpdate = true;
             geo.getAttribute('color').needsUpdate = true;
