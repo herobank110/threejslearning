@@ -1,18 +1,18 @@
 <body style="margin:0;overflow:hidden;">
-<script type="module">
-import * as THREE from "three";
+    <script type="module">
+        import * as THREE from "three";
 
-const lerp = (a, b, x) => a + (b-a)*x
-const mapRange = (x, a, b, c, d) => c + (d - c) * ((x - a) / (b - a));
+        const lerp = (a, b, x) => a + (b - a) * x
+        const mapRange = (x, a, b, c, d) => c + (d - c) * ((x - a) / (b - a));
 
 
-let {innerWidth: w,innerHeight: h} = window
-let cam = new THREE.PerspectiveCamera(40,w/h,1,10000)
-cam.position.z = 300
-let scene = new THREE.Scene
-let t=10000,n=0;
-let sm = new THREE.ShaderMaterial({
- vertexShader:`
+        let { innerWidth: w, innerHeight: h } = window
+        let cam = new THREE.PerspectiveCamera(40, w / h, 1, 10000)
+        cam.position.z = 300
+        let scene = new THREE.Scene
+        let t = 10000, n = 0;
+        let sm = new THREE.ShaderMaterial({
+            vertexShader: `
   attribute float size;
   varying vec3 vColor;
   varying float fSize;
@@ -23,7 +23,7 @@ let sm = new THREE.ShaderMaterial({
    fSize = gl_PointSize;
    gl_Position = projectionMatrix * mvp;
   }`,
- fragmentShader:`
+            fragmentShader: `
   varying vec3 vColor;
   varying float fSize;
   void main() {
@@ -31,40 +31,41 @@ let sm = new THREE.ShaderMaterial({
    float a = pow(dist + 0.3, fSize/2.5);
    gl_FragColor = vec4(vColor, a);
   }`,
- blending:THREE.AdditiveBlending,depthTest:false,transparent:true,vertexColors:true })
-let geo = new THREE.BufferGeometry
-geo.setAttribute('position',new THREE.Float32BufferAttribute(Array(t*3).fill(0),3))
-geo.setAttribute('color',new THREE.Float32BufferAttribute(Array(t*3).fill(0),3))
-geo.setAttribute('size',new THREE.Float32BufferAttribute(Array(t).fill(0),1))
-geo.getAttribute('position').setUsage(THREE.DynamicDrawUsage);
-geo.getAttribute('color').setUsage(THREE.DynamicDrawUsage);
-geo.getAttribute('size').setUsage(THREE.DynamicDrawUsage);
-geo.setDrawRange(0, 0)
+            blending: THREE.AdditiveBlending, depthTest: false, transparent: true, vertexColors: true
+        })
+        let geo = new THREE.BufferGeometry
+        geo.setAttribute('position', new THREE.Float32BufferAttribute(Array(t * 3).fill(0), 3))
+        geo.setAttribute('color', new THREE.Float32BufferAttribute(Array(t * 3).fill(0), 3))
+        geo.setAttribute('size', new THREE.Float32BufferAttribute(Array(t).fill(0), 1))
+        geo.getAttribute('position').setUsage(THREE.DynamicDrawUsage);
+        geo.getAttribute('color').setUsage(THREE.DynamicDrawUsage);
+        geo.getAttribute('size').setUsage(THREE.DynamicDrawUsage);
+        geo.setDrawRange(0, 0)
 
 
-let ps = new THREE.Points(geo,sm)
-scene.add(ps)
-let rend = new THREE.WebGLRenderer
-rend.setPixelRatio(window.devicePixelRatio)
-rend.setSize(w,h)
-document.body.appendChild(rend.domElement)
-function tick(){
- rend.render(scene,cam)
- requestAnimationFrame(tick)
-}
-tick()
+        let ps = new THREE.Points(geo, sm)
+        scene.add(ps)
+        let rend = new THREE.WebGLRenderer
+        rend.setPixelRatio(window.devicePixelRatio)
+        rend.setSize(w, h)
+        document.body.appendChild(rend.domElement)
+        function tick() {
+            rend.render(scene, cam)
+            requestAnimationFrame(tick)
+        }
+        tick()
 
-window.onmousemove=(({clientX:x,clientY:y}) => {
-if (n < t) {
-let i = n++;
-geo.getAttribute('position').setXYZ(i, x-w/2, -(y-h/2), -1000);
-geo.getAttribute('color').setXYZ(i, 1, 1, 1);
-geo.getAttribute('size').setX(i, 20);
-geo.getAttribute('position').needsUpdate = true;
-geo.getAttribute('color').needsUpdate = true;
-geo.getAttribute('size').needsUpdate = true;
-geo.setDrawRange(0, n)
-}
-})
+        window.onmousemove = (({ clientX: x, clientY: y }) => {
+            if (n < t) {
+                let i = n++;
+                geo.getAttribute('position').setXYZ(i, x - w / 2, -(y - h / 2), -1000);
+                geo.getAttribute('color').setXYZ(i, 1, 1, 1);
+                geo.getAttribute('size').setX(i, 20);
+                geo.getAttribute('position').needsUpdate = true;
+                geo.getAttribute('color').needsUpdate = true;
+                geo.getAttribute('size').needsUpdate = true;
+                geo.setDrawRange(0, n)
+            }
+        })
 
-</script>
+    </script>
