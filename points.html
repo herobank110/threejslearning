@@ -1,7 +1,8 @@
 <body style="margin:0">
 <div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.150.0/three.min.js" integrity="sha512-s23z8swIaqHGH1VAQiIO9Hv8tup9cVTV+TkhZJDXMn7/S0K7U0iVXOS5CtYvfDmsGEpoWRbl38xk7mLKEANrdQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script>
+<script type="module">
+import * as THREE from "three";
 let {innerWidth: w,innerHeight: h} = window
 let cam = new THREE.PerspectiveCamera(40,w/h,1,10000)
 cam.position.z = 300
