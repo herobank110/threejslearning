@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-type ParticleInitialAttributes = {
+type ParticleSpawnParams = {
   lifetime: number;
   color: number;
   size: number;
@@ -13,7 +13,7 @@ type ParticleLiveAttributes = {
   previousPosition: THREE.Vector3 | undefined;
 };
 
-type ParticleAttributes = ParticleInitialAttributes | ParticleLiveAttributes;
+type ParticleAttributes = ParticleSpawnParams & ParticleLiveAttributes;
 
 const vertexShader = `
 attribute float size;
@@ -67,7 +67,7 @@ export class ParticleSystem extends THREE.Object3D {
     this.add(points);
   }
 
-  spawn(attributes: ParticleInitialAttributes) {
+  spawn(attributes: ParticleSpawnParams) {
     // TODO: use this.limit, insert into free space instead of always at end/loop around?
     this.particles.push({
       ...attributes,
@@ -79,6 +79,10 @@ export class ParticleSystem extends THREE.Object3D {
   tick() {
     // TODO: update velocities and lifetimes of particles, deleting ones that are dead and tracking free space
     const dt = this.clock.getDelta();
+
+    for (const p of this.particles) {
+      p.
+    }
   }
 }
 
