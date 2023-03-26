@@ -2,7 +2,7 @@ import * as THREE from "three";
 
 type ParticleSpawnParams = {
   lifetime: number;
-  color: number;
+  color: THREE.Color;
   size: number;
   position: THREE.Vector3;
   velocity: THREE.Vector3;
@@ -51,8 +51,9 @@ export class ParticleSystem extends THREE.Object3D {
     geo.setAttribute("position", makeFloatArray(limit, 3));
     geo.setAttribute("color", makeFloatArray(limit, 3));
     geo.setAttribute("size", makeFloatArray(limit, 1));
-    for (const attr of ["position", "color", "size"].map(geo.getAttribute))
-      (attr as THREE.BufferAttribute).setUsage(THREE.StreamDrawUsage);
+    this.geoAttrPosition.setUsage(THREE.StaticDrawUsage);
+    this.geoAttrColor.setUsage(THREE.StaticDrawUsage);
+    this.geoAttrSize.setUsage(THREE.StaticDrawUsage);
     geo.setDrawRange(0, 0);
 
     mtl.setValues({
@@ -67,6 +68,13 @@ export class ParticleSystem extends THREE.Object3D {
     this.add(points);
   }
 
+  /**
+   * Register a particle to the system.
+   * 
+   * After spawning, no modifications may be made to particles.
+   * 
+   * Particles are updated until the next call to `tick`
+   */
   spawn(attributes: ParticleSpawnParams) {
     // TODO: use this.limit, insert into free space instead of always at end/loop around?
     this.particles.push({
@@ -81,25 +89,54 @@ export class ParticleSystem extends THREE.Object3D {
     const deltaTime = this.clock.getDelta();
 
     // Particles which will be still alive after this tick.
-    const newParticles = []
+    const newParticles: ParticleAttributes[] = [];
     for (const p of this.particles) {
       // Lifetime update
       p.time += deltaTime;
       if (p.time > p.lifetime) {
         // Particle has outlived its lifetime. Exclude from new array.
-        continue
+        continue;
       }
       // If still alive, push to new array.
-      newParticles.push(p)
+      newParticles.push(p);
 
       // Velocity/position update
-      p.position.addScaledVector(p.velocity, deltaTime)
+      p.position.addScaledVector(p.velocity, deltaTime);
       // TODO: add acceleration?
       // p.velocity.multiplyScalar((1/ p.acceleration * dt)
     }
 
     this.particles = newParticles;
     // update gpu draw info
+    for (let i = 0; i < newParticles.length; i++) {
+      let p = newParticles[i];
+      this.geoAttrPosition.setXYZ(i, p.position.x, p.position.y, p.position.z);
+      this.geoAttrColor.setXYZ(i, p.color.r, p.color.g, p.color.b);
+      this.geoAttrSize.setX(i, p.size);
+    }
+    this.dirtyDrawState();
+    this.geo.setDrawRange(0, newParticles.length);
+  }
+
+
+  // helpers
+
+  private get geoAttrPosition() {
+    return this.geo.getAttribute("position") as THREE.BufferAttribute;
+  }
+
+  private get geoAttrColor() {
+    return this.geo.getAttribute("color") as THREE.BufferAttribute;
+  }
+
+  private get geoAttrSize() {
+    return this.geo.getAttribute("size") as THREE.BufferAttribute;
+  }
+
+  private dirtyDrawState() {
+    this.geoAttrPosition.needsUpdate = true;
+    this.geoAttrColor.needsUpdate = true;
+    this.geoAttrSize.needsUpdate = true;
   }
 }
 
