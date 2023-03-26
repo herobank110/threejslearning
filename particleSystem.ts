@@ -80,7 +80,7 @@ export class ParticleSystem extends THREE.Object3D {
 
   tick() {
     // TODO: update velocities and lifetimes of particles, deleting ones that are dead and tracking free space
-    this.clock.getDelta();
+    const dt = this.clock.getDelta();
   }
 }
 
