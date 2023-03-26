@@ -49,28 +49,33 @@ window.onmousemove = ({ clientX: x, clientY: y }) => {
   for (let i = 0; i < points.length; i++) {
     const [xi, yi] = points[i];
 
-    // Get velocity as gradient per point in path, scaled.
-    const velocity = new THREE.Vector3();
-    let [xi_1, yi_1] = [xi, yi];
-    if (i != 0)
-      // points along this new path
-      [xi_1, yi_1] = points[i - 1];
-    else if (lastP)
-      // first point in this path but previous points were drawn
-      [xi_1, yi_1] = lastP;
-    let [dx, dy] = [xi - xi_1, yi - yi_1];
-    dx *= Math.random() - .5
-    dy *= Math.random() - .5
-    velocity.set(dx, dy, 0);
-    velocity.multiplyScalar(Math.random() * 10);
+    const coreVelocity = getVelocityAtPoint(i, points);
 
     ps.spawn({
       color: new THREE.Color(0xaaaaaa),
       lifetime: 2,
       position: new THREE.Vector3(xi - w / 2, -(yi - h / 2), -1000),
-      velocity,
+      velocity: coreVelocity.clone().multiplyScalar(10),
       size: 30,
     });
   }
   lastP = points[points.length - 1];
 };
+
+/** Get velocity as gradient per point in path, scaled. */
+function getVelocityAtPoint(i: number, points: [number, number][]) {
+  const [xi, yi] = points[i];
+  const velocity = new THREE.Vector3();
+  let [xi_1, yi_1] = [xi, yi];
+  if (i != 0)
+    // points along this new path
+    [xi_1, yi_1] = points[i - 1];
+  else if (lastP)
+    // first point in this path but previous points were drawn
+    [xi_1, yi_1] = lastP;
+  let [dx, dy] = [xi - xi_1, yi - yi_1];
+  dx *= Math.random() - 0.5;
+  dy *= Math.random() - 0.5;
+  velocity.set(dx, dy, 0);
+  return velocity;
+}
