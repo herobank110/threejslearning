@@ -43,13 +43,12 @@ function getPath(x: number, y: number) {
   return points;
 }
 
-let lastP: [number, number] | undefined;
 window.onmousemove = ({ clientX: x, clientY: y }) => {
   const points = getPath(x, y);
   for (let i = 0; i < points.length; i++) {
     const [xi, yi] = points[i];
 
-    const coreVelocity = getVelocityAtPoint(i, points);
+    const coreVelocity = getVelocityAtPoint(xi, yi);
 
     const position = new THREE.Vector3(xi - w / 2, -(yi - h / 2), -1000);
     // head spray
@@ -77,27 +76,28 @@ window.onmousemove = ({ clientX: x, clientY: y }) => {
       position: position.clone(),
       velocity: coreVelocity
         .clone()
-        .multiplyScalar(lerp(100, 200, Math.random())),
+        .multiply(new THREE.Vector3(
+          lerp(100, 200, Math.random()),
+          lerp(100, 200, Math.random()),
+        )),
+        // .multiplyScalar(lerp(100, 200, Math.random())),
       size: 20,
     });
   }
-  lastP = points[points.length - 1];
 };
 
+let lastP: [number, number] | undefined;
+
 /** Get velocity as gradient per point in path, scaled. */
-function getVelocityAtPoint(i: number, points: [number, number][]) {
-  const [xi, yi] = points[i];
+function getVelocityAtPoint(xi: number, yi: number) {
   const velocity = new THREE.Vector3();
   let [xi_1, yi_1] = [xi, yi];
-  if (i != 0)
-    // points along this new path
-    [xi_1, yi_1] = points[i - 1];
-  else if (lastP)
-    // first point in this path but previous points were drawn
+  if (lastP) {
     [xi_1, yi_1] = lastP;
-  let [dx, dy] = [xi - xi_1, yi - yi_1];
-  dx *= Math.random() - 0.5;
-  dy *= Math.random() - 0.5;
-  velocity.set(dx, dy, 0);
+    let [dx, dy] = [xi - xi_1, yi - yi_1];
+    // Invert y axis (screen to world)
+    velocity.set(dx, -dy, 0);
+  }
+  lastP = [xi, yi];
   return velocity;
 }
