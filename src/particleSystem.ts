@@ -38,25 +38,22 @@ void main() {
 
 export class ParticleSystem extends THREE.Object3D {
   private particles: ParticleAttributes[] = [];
+  private clock = new THREE.Clock();
+  private geo = new THREE.BufferGeometry();
+  private mtl = new THREE.ShaderMaterial();
+  private points = new THREE.Points(this.geo, this.mtl);
 
-  constructor(
-    public readonly limit = 100_000,
-    private clock = new THREE.Clock(),
-    private geo = new THREE.BufferGeometry(),
-    private mtl = new THREE.ShaderMaterial(),
-    private points = new THREE.Points(geo, mtl)
-  ) {
+  constructor(public readonly limit = 100_000) {
     super();
 
-    geo.setAttribute("position", makeFloatArray(limit, 3));
-    geo.setAttribute("color", makeFloatArray(limit, 3));
-    geo.setAttribute("size", makeFloatArray(limit, 1));
+    this.geo.setAttribute("position", makeFloatArray(limit, 3));
+    this.geo.setAttribute("color", makeFloatArray(limit, 3));
+    this.geo.setAttribute("size", makeFloatArray(limit, 1));
     this.geoAttrPosition.setUsage(THREE.StaticDrawUsage);
     this.geoAttrColor.setUsage(THREE.StaticDrawUsage);
     this.geoAttrSize.setUsage(THREE.StaticDrawUsage);
-    geo.setDrawRange(0, 0);
 
-    mtl.setValues({
+    this.mtl.setValues({
       vertexShader,
       fragmentShader,
       blending: THREE.AdditiveBlending,
@@ -65,14 +62,14 @@ export class ParticleSystem extends THREE.Object3D {
       vertexColors: true,
     });
 
-    this.add(points);
+    this.add(this.points);
   }
 
   /**
    * Register a particle to the system.
-   * 
+   *
    * After spawning, no modifications may be made to particles.
-   * 
+   *
    * Particles are updated until the next call to `tick`
    */
   spawn(attributes: ParticleSpawnParams) {
@@ -117,7 +114,6 @@ export class ParticleSystem extends THREE.Object3D {
     this.dirtyDrawState();
     this.geo.setDrawRange(0, newParticles.length);
   }
-
 
   // helpers
 

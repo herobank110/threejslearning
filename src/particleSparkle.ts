@@ -9,14 +9,14 @@ let { innerWidth: w, innerHeight: h } = window;
 let cam = new THREE.PerspectiveCamera(40, w / h, 1, 10000);
 cam.position.z = 300;
 let scene = new THREE.Scene();
-
-let ps = new ParticleSystem()
+let ps = new ParticleSystem();
 scene.add(ps);
 let rend = new THREE.WebGLRenderer();
 rend.setPixelRatio(window.devicePixelRatio);
 rend.setSize(w, h);
 document.body.appendChild(rend.domElement);
 function tick() {
+  ps.tick();
   rend.render(scene, cam);
   requestAnimationFrame(tick);
 }
@@ -42,22 +42,16 @@ function getPath(x: number, y: number) {
 }
 
 window.onmousemove = ({ clientX: x, clientY: y }) => {
-  if (n >= t) return;
+  // if (n >= t) return;
   let p = getPath(x, y);
   for (let i = 0; i < p.length; i++) {
     const [xi, yi] = p[i];
-    geo
-      .getAttribute("position")
-      // @ts-ignore
-      .setXYZ(n + i, xi - w / 2, -(yi - h / 2), -1000);
-    // @ts-ignore
-    geo.getAttribute("color").setXYZ(n + i, 1, 1, 1);
-    // @ts-ignore
-    geo.getAttribute("size").setX(n + i, 30);
+    ps.spawn({
+      color: new THREE.Color(0xaaaaaa),
+      lifetime: 2,
+      position: new THREE.Vector3(xi - w / 2, -(yi - h / 2), -1000),
+      velocity: new THREE.Vector3(),
+      size: 30,
+    });
   }
-  geo.getAttribute("position").needsUpdate = true;
-  geo.getAttribute("color").needsUpdate = true;
-  geo.getAttribute("size").needsUpdate = true;
-  n += p.length;
-  geo.setDrawRange(0, n);
 };
