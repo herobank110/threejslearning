@@ -56,7 +56,7 @@ window.onmousemove = ({ clientX: x, clientY: y }) => {
     ps.spawn({
       color: new THREE.Color(0xaaaa22),
       lifetime: 0.25,
-      position,
+      position: position.clone(),
       velocity: coreVelocity.clone().multiplyScalar(10),
       size: lerp(50, 80, Math.random()),
     });
@@ -65,7 +65,7 @@ window.onmousemove = ({ clientX: x, clientY: y }) => {
     ps.spawn({
       color: new THREE.Color(0xaaaaaa),
       lifetime: 2,
-      position,
+      position: position.clone(),
       velocity: coreVelocity.clone().multiplyScalar(10),
       size: 30,
     });
@@ -74,7 +74,7 @@ window.onmousemove = ({ clientX: x, clientY: y }) => {
     ps.spawn({
       color: new THREE.Color(0x444444),
       lifetime: 2.8,
-      position,
+      position: position.clone(),
       velocity: coreVelocity
         .clone()
         .multiplyScalar(lerp(100, 200, Math.random())),
@@ -96,8 +96,8 @@ function getVelocityAtPoint(i: number, points: [number, number][]) {
     // first point in this path but previous points were drawn
     [xi_1, yi_1] = lastP;
   let [dx, dy] = [xi - xi_1, yi - yi_1];
-  // dx *= Math.random() - 0.5;
-  // dy *= Math.random() - 0.5;
+  dx *= Math.random() - 0.5;
+  dy *= Math.random() - 0.5;
   velocity.set(dx, dy, 0);
   return velocity;
 }
