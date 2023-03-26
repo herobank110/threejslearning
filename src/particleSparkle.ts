@@ -48,9 +48,17 @@ window.onmousemove = ({ clientX: x, clientY: y }) => {
   for (let i = 0; i < points.length; i++) {
     const [xi, yi] = points[i];
 
-    const coreVelocity = getVelocityAtPoint(xi, yi);
-
     const position = new THREE.Vector3(xi - w / 2, -(yi - h / 2), -1000);
+
+    const coreVelocity = getVelocityAtPoint(xi, yi);
+    coreVelocity.multiply(
+      new THREE.Vector3(
+        mapRange(Math.random(), 0, 1, -0.8, 1.8),
+        mapRange(Math.random(), 0, 1, -0.8, 1.8),
+        mapRange(Math.random(), 0, 1, -0.8, 1.8)
+      )
+    );
+
     // head spray
     ps.spawn({
       color: new THREE.Color(0xaaaa22),
@@ -76,12 +84,8 @@ window.onmousemove = ({ clientX: x, clientY: y }) => {
       position: position.clone(),
       velocity: coreVelocity
         .clone()
-        .multiply(new THREE.Vector3(
-          lerp(100, 200, Math.random()),
-          lerp(100, 200, Math.random()),
-        )),
-        // .multiplyScalar(lerp(100, 200, Math.random())),
-      size: 20,
+        .multiplyScalar(lerp(100, 200, Math.random())),
+      size: 23,
     });
   }
 };
