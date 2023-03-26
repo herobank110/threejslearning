@@ -78,11 +78,28 @@ export class ParticleSystem extends THREE.Object3D {
 
   tick() {
     // TODO: update velocities and lifetimes of particles, deleting ones that are dead and tracking free space
-    const dt = this.clock.getDelta();
+    const deltaTime = this.clock.getDelta();
 
+    // Particles which will be still alive after this tick.
+    const newParticles = []
     for (const p of this.particles) {
-      p.
+      // Lifetime update
+      p.time += deltaTime;
+      if (p.time > p.lifetime) {
+        // Particle has outlived its lifetime. Exclude from new array.
+        continue
+      }
+      // If still alive, push to new array.
+      newParticles.push(p)
+
+      // Velocity/position update
+      p.position.addScaledVector(p.velocity, deltaTime)
+      // TODO: add acceleration?
+      // p.velocity.multiplyScalar((1/ p.acceleration * dt)
     }
+
+    this.particles = newParticles;
+    // update gpu draw info
   }
 }
 
