@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "points": "parcel --cache-dir=build/cache --dist-dir=build/dist src/points.html --open"
+    "start": "parcel --cache-dir=build/cache --dist-dir=build/dist src/index.html --open"
   },
   "keywords": [],
   "author": "",
