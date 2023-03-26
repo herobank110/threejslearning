@@ -25,7 +25,6 @@ tick();
 let [lastX, lastY] = [-1, -1];
 function getPath(x: number, y: number) {
   const points: [number, number][] = [];
-  const velocity = new THREE.Vector3();
   if (lastX == -1) {
     // Beginning of line - only possible to add one point.
     points.push([x, y]);
@@ -37,19 +36,34 @@ function getPath(x: number, y: number) {
     let l = vlen(dx, dy);
     for (let i = 0; i < l; i += 2)
       points.push([lerp(lastX, x, i / l), lerp(lastY, y, i / l)]);
-    velocity.set(dx, dy, 0);
   }
 
   lastX = x;
   lastY = y;
-  return {points, velocity};
+  return points;
 }
 
+let lastP: [number, number] | undefined;
 window.onmousemove = ({ clientX: x, clientY: y }) => {
-  // if (n >= t) return;
-  const {points, velocity} = getPath(x, y);
+  const points = getPath(x, y);
   for (let i = 0; i < points.length; i++) {
     const [xi, yi] = points[i];
+
+    // Get velocity as gradient per point in path, scaled.
+    const velocity = new THREE.Vector3();
+    let [xi_1, yi_1] = [xi, yi];
+    if (i != 0)
+      // points along this new path
+      [xi_1, yi_1] = points[i - 1];
+    else if (lastP)
+      // first point in this path but previous points were drawn
+      [xi_1, yi_1] = lastP;
+    let [dx, dy] = [xi - xi_1, yi - yi_1];
+    dx *= Math.random() - .5
+    dy *= Math.random() - .5
+    velocity.set(dx, dy, 0);
+    velocity.multiplyScalar(Math.random() * 10);
+
     ps.spawn({
       color: new THREE.Color(0xaaaaaa),
       lifetime: 2,
@@ -58,4 +72,5 @@ window.onmousemove = ({ clientX: x, clientY: y }) => {
       size: 30,
     });
   }
+  lastP = points[points.length - 1];
 };
