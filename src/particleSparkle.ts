@@ -24,33 +24,37 @@ tick();
 
 let [lastX, lastY] = [-1, -1];
 function getPath(x: number, y: number) {
-  let ret: [number, number][] = [];
-  if (lastX == -1) ret.push([x, y]);
-  else {
+  const points: [number, number][] = [];
+  const velocity = new THREE.Vector3();
+  if (lastX == -1) {
+    // Beginning of line - only possible to add one point.
+    points.push([x, y]);
+  } else {
+    // Connect to previous point with paths at every world unit.
     x = lerp(lastX, x, 0.4);
     y = lerp(lastY, y, 0.4);
     let [dx, dy] = [x - lastX, y - lastY];
     let l = vlen(dx, dy);
     for (let i = 0; i < l; i += 2)
-      ret.push([lerp(lastX, x, i / l), lerp(lastY, y, i / l)]);
+      points.push([lerp(lastX, x, i / l), lerp(lastY, y, i / l)]);
+    velocity.set(dx, dy, 0);
   }
 
   lastX = x;
   lastY = y;
-  console.log(lastX, lastY);
-  return ret;
+  return {points, velocity};
 }
 
 window.onmousemove = ({ clientX: x, clientY: y }) => {
   // if (n >= t) return;
-  let p = getPath(x, y);
-  for (let i = 0; i < p.length; i++) {
-    const [xi, yi] = p[i];
+  const {points, velocity} = getPath(x, y);
+  for (let i = 0; i < points.length; i++) {
+    const [xi, yi] = points[i];
     ps.spawn({
       color: new THREE.Color(0xaaaaaa),
       lifetime: 2,
       position: new THREE.Vector3(xi - w / 2, -(yi - h / 2), -1000),
-      velocity: new THREE.Vector3(),
+      velocity,
       size: 30,
     });
   }
