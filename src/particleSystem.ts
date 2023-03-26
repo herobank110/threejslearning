@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { BufferAttribute, GLBufferAttribute } from "three";
 
 type ParticleInitialAttributes = {
   lifetime: number;
@@ -52,9 +51,8 @@ export class ParticleSystem extends THREE.Object3D {
     geo.setAttribute("position", makeFloatArray(limit, 3));
     geo.setAttribute("color", makeFloatArray(limit, 3));
     geo.setAttribute("size", makeFloatArray(limit, 1));
-    (<BufferAttribute>geo.attributes.position).setUsage(THREE.DynamicDrawUsage);
-    (<BufferAttribute>geo.attributes.color).setUsage(THREE.DynamicDrawUsage);
-    (<BufferAttribute>geo.attributes.size).setUsage(THREE.DynamicDrawUsage);
+    for (const attr of ["position", "color", "size"].map(geo.getAttribute))
+      (attr as THREE.BufferAttribute).setUsage(THREE.StreamDrawUsage);
     geo.setDrawRange(0, 0);
 
     mtl.setValues({
