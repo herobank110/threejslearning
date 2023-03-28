@@ -1,6 +1,52 @@
 import * as THREE from "three";
 import { ParticleSystem } from "./particleSystem";
 
+class LineBuilder {
+  private lastMousePosition: [number, number] | undefined;
+  private lastPathPoint: [number, number] | undefined;
+
+  /**
+   * @returns Velocity from this point and the previous call to this function.
+   * Converts from screen coords in pixels to 3d world units.
+   */
+  getVelocityFromPrevious(xi: number, yi: number) {
+    const velocity = new THREE.Vector3();
+    let [xi_1, yi_1] = [xi, yi];
+    if (this.lastPathPoint) {
+      [xi_1, yi_1] = this.lastPathPoint;
+      let [dx, dy] = [xi - xi_1, yi - yi_1];
+      // Invert y axis (screen to world)
+      velocity.set(dx, -dy, 0);
+    }
+    this.lastPathPoint = [xi, yi];
+    return velocity;
+  }
+
+  /**
+   * @returns array of points interpolating between this point and the previous
+   * call to this function.
+   */
+  getPathToNextMousePosition(x: number, y: number) {
+    const points: [number, number][] = [];
+    if (!this.lastMousePosition) {
+      // Beginning of line - only possible to add one point.
+      points.push([x, y]);
+    } else {
+      const [lastX, lastY] = this.lastMousePosition;
+      // Connect to previous point with paths at every world unit.
+      x = lerp(lastX, x, 0.4);
+      y = lerp(lastY, y, 0.4);
+      let [dx, dy] = [x - lastX, y - lastY];
+      let l = vlen(dx, dy);
+      for (let i = 0; i < l; i += 2)
+        points.push([lerp(lastX, x, i / l), lerp(lastY, y, i / l)]);
+    }
+
+    this.lastMousePosition = [x, y];
+    return points;
+  }
+}
+
 const lerp = (a, b, x) => a + (b - a) * x;
 const vlen = (a, b) => Math.sqrt(a * a + b * b);
 const mapRange = (x, a, b, c, d) => c + (d - c) * ((x - a) / (b - a));
@@ -22,35 +68,16 @@ function tick() {
 }
 tick();
 
-let [lastX, lastY] = [-1, -1];
-function getPath(x: number, y: number) {
-  const points: [number, number][] = [];
-  if (lastX == -1) {
-    // Beginning of line - only possible to add one point.
-    points.push([x, y]);
-  } else {
-    // Connect to previous point with paths at every world unit.
-    x = lerp(lastX, x, 0.4);
-    y = lerp(lastY, y, 0.4);
-    let [dx, dy] = [x - lastX, y - lastY];
-    let l = vlen(dx, dy);
-    for (let i = 0; i < l; i += 2)
-      points.push([lerp(lastX, x, i / l), lerp(lastY, y, i / l)]);
-  }
-
-  lastX = x;
-  lastY = y;
-  return points;
-}
+let line = new LineBuilder();
 
 window.onmousemove = ({ clientX: x, clientY: y }) => {
-  const points = getPath(x, y);
+  const points = line.getPathToNextMousePosition(x, y);
   for (let i = 0; i < points.length; i++) {
     const [xi, yi] = points[i];
 
     const position = new THREE.Vector3(xi - w / 2, -(yi - h / 2), -1000);
 
-    const coreVelocity = getVelocityAtPoint(xi, yi);
+    const coreVelocity = line.getVelocityFromPrevious(xi, yi);
     coreVelocity.multiply(
       new THREE.Vector3(
         mapRange(Math.random(), 0, 1, -0.8, 1.8),
@@ -89,19 +116,3 @@ window.onmousemove = ({ clientX: x, clientY: y }) => {
     });
   }
 };
-
-let lastP: [number, number] | undefined;
-
-/** Get velocity as gradient per point in path, scaled. */
-function getVelocityAtPoint(xi: number, yi: number) {
-  const velocity = new THREE.Vector3();
-  let [xi_1, yi_1] = [xi, yi];
-  if (lastP) {
-    [xi_1, yi_1] = lastP;
-    let [dx, dy] = [xi - xi_1, yi - yi_1];
-    // Invert y axis (screen to world)
-    velocity.set(dx, -dy, 0);
-  }
-  lastP = [xi, yi];
-  return velocity;
-}
