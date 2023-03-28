@@ -80,9 +80,9 @@ window.onmousemove = ({ clientX: x, clientY: y }) => {
     const coreVelocity = line.getVelocityFromPrevious(xi, yi);
     coreVelocity.multiply(
       new THREE.Vector3(
-        mapRange(Math.random(), 0, 1, -0.8, 1.8),
-        mapRange(Math.random(), 0, 1, -0.8, 1.8),
-        mapRange(Math.random(), 0, 1, -0.8, 1.8)
+        lerp(-0.8, 1.8, Math.random()),
+        lerp(-0.8, 1.8, Math.random()),
+        lerp(-0.8, 1.8, Math.random())
       )
     );
 
