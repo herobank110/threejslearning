@@ -58,7 +58,7 @@ let scene = new THREE.Scene();
 let ps = new ParticleSystem();
 scene.add(ps);
 let rend = new THREE.WebGLRenderer();
-rend.setPixelRatio(window.devicePixelRatio);
+// rend.setPixelRatio(window.devicePixelRatio);
 rend.setSize(w, h);
 document.body.appendChild(rend.domElement);
 function tick() {
@@ -70,7 +70,7 @@ tick();
 
 let line = new LineBuilder();
 
-window.onmousemove = ({ clientX: x, clientY: y }) => {
+function handleMove(x: number, y: number) {
   const points = line.getPathToNextMousePosition(x, y);
   for (let i = 0; i < points.length; i++) {
     const [xi, yi] = points[i];
@@ -115,4 +115,9 @@ window.onmousemove = ({ clientX: x, clientY: y }) => {
       size: 23,
     });
   }
-};
+}
+
+// @ts-ignore
+window.ontouchmove = ({ touches: [{ clientX: x, clientY: y }] }) =>
+  handleMove(x, y);
+window.onmousemove = ({ clientX: x, clientY: y }) => handleMove(x, y);
