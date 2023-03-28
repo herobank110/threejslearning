@@ -70,7 +70,7 @@ export class ParticleSystem extends THREE.Object3D {
    *
    * After spawning, no modifications may be made to particles.
    *
-   * Particles are updated until the next call to `tick`
+   * Particles are not updated until the next call to `tick`
    */
   spawn(attributes: ParticleSpawnParams) {
     // TODO: use this.limit, insert into free space instead of always at end/loop around?
