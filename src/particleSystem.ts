@@ -103,6 +103,10 @@ export class ParticleSystem extends THREE.Object3D {
       // p.velocity.multiplyScalar((1/ p.acceleration * dt)
     }
 
+    this.reassignParticles(newParticles);
+  }
+
+  private reassignParticles(newParticles: ParticleAttributes[]) {
     this.particles = newParticles;
     // update gpu draw info
     for (let i = 0; i < newParticles.length; i++) {
